@@ -1,3 +1,16 @@
 phisheye:
   whois:
     apikey: ${PSHISEYE_WHOIS_APIKEY}
+
+spring:
+  datasource:
+    driverClassName: org.sqlite.JDBC
+    url: jdbc:sqlite:memory:myDb?cache=shared
+    username: username
+    password: supersecurepassword
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create-drop
+      show-sql: true
