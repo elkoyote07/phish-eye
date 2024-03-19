@@ -58,4 +58,18 @@ public class DomainNameServerController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Operation(summary = "All process init")
+    @PostMapping(path = "/full-init")
+    public ResponseEntity<Set<String>> fullInit(
+            @RequestParam(name = "original", required = true) String originDns,
+            @RequestParam(name = "visual_similarity", required = true, defaultValue = "false") Boolean applyVisualSimilarity,
+            @RequestParam(name = "visual_similarity_score", required = true) int visualSimilarityScore,
+            @RequestParam(name = "tls", required = true) String tls
+    ){
+        log.info("Starting all process init");
+        simpleFacade.automatedFullProcessByDns(originDns, applyVisualSimilarity, visualSimilarityScore, tls);
+        log.info("Finished all process init");
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

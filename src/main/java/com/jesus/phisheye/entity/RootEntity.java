@@ -15,15 +15,24 @@ public class RootEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "domain_id", nullable = false)
+    @Column(name = "owned", nullable = false)
+    private Boolean owned;
+
+    @Column(name = "is_info", nullable = false)
+    private Boolean isInfo;
+
+    @Column(name = "dns", nullable = false)
+    private String dns;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "domain_id")
     private DomainEntity domainEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "registrant_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "registrant_id")
     private RegistrantEntity registrantEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "registrar_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "registrar_id")
     private RegistrarEntity registrarEntity;
 }

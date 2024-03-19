@@ -18,5 +18,7 @@ public class RootDTO {
     private RegistrarDTO registrar;
     @JsonProperty("registrant")
     private RegistrantDTO registrant;
-
+    private Boolean owned;
+    private Boolean isInfo;
+    private String dns;
 }

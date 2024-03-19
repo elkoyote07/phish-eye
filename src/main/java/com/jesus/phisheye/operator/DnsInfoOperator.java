@@ -1,5 +1,7 @@
 package com.jesus.phisheye.operator;
 
+import com.jesus.phisheye.dto.RootDTO;
+
 public interface DnsInfoOperator {
-    void getInfo(String dns);
+    RootDTO getInfo(String dns);
 }

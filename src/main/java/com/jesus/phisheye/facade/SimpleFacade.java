@@ -8,4 +8,6 @@ public interface SimpleFacade {
     Set<String> genSwitchTldsByDnsWithoutTld(String originDns);
 
     void printInfo(String originDns);
+
+    void automatedFullProcessByDns(String originDns, Boolean applyVisualSimilarity, int visualSimilarityScore, String tls);
 }
