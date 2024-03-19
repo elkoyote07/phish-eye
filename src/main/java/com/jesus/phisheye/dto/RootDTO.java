@@ -21,4 +21,6 @@ public class RootDTO {
     private Boolean owned;
     private Boolean isInfo;
     private String dns;
+    private String originDns;
+
 }

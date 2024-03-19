@@ -1,8 +1,7 @@
 package com.jesus.phisheye.controller;
 
+import com.jesus.phisheye.dto.RootDTO;
 import com.jesus.phisheye.facade.SimpleFacade;
-import com.jesus.phisheye.operator.HomoglyphOperator;
-import com.jesus.phisheye.operator.SwitchTldsOperator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +15,7 @@ import java.util.Set;
 @Tag(name = "Document Controller", description = "Endpoints for Document")
 @Slf4j
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST})
 @RequestMapping("/dns")
 public class DomainNameServerController {
 
@@ -23,7 +23,7 @@ public class DomainNameServerController {
     private SimpleFacade simpleFacade;
 
     @Operation(summary = "Create homoglyphs based on dns")
-    @PostMapping(path = "/homoglyph")
+    @GetMapping(path = "/homoglyph")
     public ResponseEntity<Set<String>> createHomoglyphs(
             @RequestParam(name = "original", required = true) String originDns,
             @RequestParam(name = "visual_similarity", required = true, defaultValue = "false") Boolean applyVisualSimilarity,
@@ -53,9 +53,9 @@ public class DomainNameServerController {
             @RequestParam(name = "original", required = true) String originDns
     ){
         log.info("Starting endpoint print info dns");
-        simpleFacade.printInfo(originDns);
+        RootDTO rootDTO = simpleFacade.printInfo(originDns);
         log.info("Finishing endpoint print info dns");
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(rootDTO, HttpStatus.OK);
     }
 
     @Operation(summary = "All process init")
@@ -70,6 +70,27 @@ public class DomainNameServerController {
         simpleFacade.automatedFullProcessByDns(originDns, applyVisualSimilarity, visualSimilarityScore, tls);
         log.info("Finished all process init");
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "PishEye")
+    @PostMapping(path = "/phisheye")
+    public ResponseEntity<Set<String>> fullInit(
+            @RequestParam(name = "dns", required = true) String fullDns,
+            @RequestParam(name = "original", required = true) String originDns,
+            @RequestParam(name = "visual_similarity", required = true, defaultValue = "false") Boolean applyVisualSimilarity,
+            @RequestParam(name = "visual_similarity_score", required = true) int visualSimilarityScore,
+            @RequestParam(name = "tls", required = true) String tls
+    ){
+        log.info("Starting all process init");
+        Set<String> detectedDomains = simpleFacade.phisheyeProcess(fullDns, originDns, applyVisualSimilarity, visualSimilarityScore, tls);
+        if (!detectedDomains.isEmpty()){
+            log.warn("DETECTED THREAT");
+            for (String s: detectedDomains){
+                log.warn(s);
+            }
+        }
+        log.info("Finished all process init");
+        return new ResponseEntity<>(detectedDomains, HttpStatus.OK);
     }
 
 }

@@ -6,11 +6,12 @@ import com.jesus.phisheye.dto.DomainDTO;
 import com.jesus.phisheye.dto.RootDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.io.IOException;
 
 @Service
 public class DnsInfoOperatorImpl implements DnsInfoOperator{
@@ -28,10 +29,10 @@ public class DnsInfoOperatorImpl implements DnsInfoOperator{
         RootDTO rootDTO;
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Status Code: " + response.statusCode());
-            System.out.println("Response Body: " + response.body());
+            //System.out.println("Status Code: " + response.statusCode());
+            //System.out.println("Response Body: " + response.body());
             rootDTO = objectMapper.readValue(response.body(), RootDTO.class);
-            System.out.println(rootDTO);
+            //System.out.println(rootDTO);
             return rootDTO;
         } catch (IOException | InterruptedException e) {
             rootDTO = new RootDTO();

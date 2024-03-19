@@ -1,6 +1,5 @@
 package com.jesus.phisheye.repository;
 
-import com.jesus.phisheye.entity.RootEntity;
 import com.jesus.phisheye.entity.StatusEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

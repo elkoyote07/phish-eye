@@ -45,10 +45,11 @@ public class SimpleFacadeImpl implements SimpleFacade{
     }
 
     @Override
-    public void printInfo(String originDns) {
+    public RootDTO printInfo(String originDns) {
         log.info("Starting simple facade print info dns");
         RootDTO rootDTO = dnsInfoOperator.getInfo(originDns);
         log.info("Finishing simple facade print info dns");
+        return rootDTO;
     }
 
     @Override
@@ -90,6 +91,8 @@ public class SimpleFacadeImpl implements SimpleFacade{
 
             rootDTO.setDns(rootDTO.getDomain().getDomain());
 
+            rootDTO.setOriginDns(originDns + tls);
+
             rootDTOSet.add(rootDTO);
             log.info("Finishing simple facade print info dns");
         }
@@ -99,4 +102,73 @@ public class SimpleFacadeImpl implements SimpleFacade{
 
         log.info("Finished fully process");
     }
+
+    @Override
+    public Set<String> phisheyeProcess(String fullDns, String originDns, Boolean applyVisualSimilarity, int visualSimilarityScore, String tls) {
+        log.info("Starting fully process");
+
+        Set<RootDTO> initRootDTOSet = saverOperator.findFullDns(fullDns);
+
+        log.info("Starting simple facade homoglyphs based on dns");
+        Set<String> homoglyphsResultList = homoglyphOperator.genByDnsWithoutTld(originDns, applyVisualSimilarity, visualSimilarityScore);
+        homoglyphsResultList.add(originDns);
+        log.info("Finishing simple facade homoglyphs based on dns");
+
+        Set<String> switchTldsResultList = new HashSet<>();
+        for (String dnsHomoglyph:
+                homoglyphsResultList){
+            log.info("Starting simple facade typposquatting switching tlds");
+            Set<String> tmp = new HashSet<>();
+            tmp = switchTldsOperator.genByDnsWithoutTld(dnsHomoglyph);
+            switchTldsResultList.addAll(tmp);
+            log.info("Finishing simple facade typposquatting switching tlds");
+        }
+
+        Set<RootDTO> rootDTOSet = new HashSet<>();
+        for (String dns:
+                switchTldsResultList){
+            log.info("Starting simple facade print info dns");
+            RootDTO rootDTO = dnsInfoOperator.getInfo(dns);
+
+            if (rootDTO.getDomain().getDomain().contains(fullDns)){
+                rootDTO.setOwned(true);
+            } else {
+                rootDTO.setOwned(false);
+            }
+
+            if (rootDTO.getDomain().getId() != null){
+                rootDTO.setIsInfo(true);
+            } else {
+                rootDTO.setIsInfo(false);
+            }
+
+            rootDTO.setDns(rootDTO.getDomain().getDomain());
+
+            rootDTO.setOriginDns(originDns + tls);
+
+            rootDTOSet.add(rootDTO);
+            log.info("Finishing simple facade print info dns");
+        }
+
+        saverOperator.clean(fullDns);
+        log.info("Starting saver process");
+        saverOperator.fullRootSet(rootDTOSet);
+        log.info("Finished saver process");
+
+        Set<String> foundAlert = new HashSet<>();
+        for (RootDTO newRootDTO : rootDTOSet) {
+            for (RootDTO initRootDTO : initRootDTOSet) {
+                if (newRootDTO.getDns().equals(initRootDTO.getDns())) {
+                    if (!initRootDTO.getIsInfo() && newRootDTO.getIsInfo()) {
+                        foundAlert.add(newRootDTO.getDns());
+                    }
+                    break;
+                }
+            }
+        }
+        log.info("Finished fully process");
+        return foundAlert;
+    }
+
+
 }

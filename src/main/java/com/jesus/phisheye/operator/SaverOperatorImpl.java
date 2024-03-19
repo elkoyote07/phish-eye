@@ -1,6 +1,5 @@
 package com.jesus.phisheye.operator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jesus.phisheye.dto.DomainDTO;
 import com.jesus.phisheye.dto.RootDTO;
 import com.jesus.phisheye.entity.*;
@@ -44,6 +43,9 @@ public class SaverOperatorImpl implements SaverOperator{
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private CustomRootRepository customRootRepository;
 
     @Transactional
     @Override
@@ -104,6 +106,24 @@ public class SaverOperatorImpl implements SaverOperator{
 
         rootRepository.saveAll(rootEntitySet);
 
+    }
+
+    @Transactional
+    @Override
+    public void clean(String originDns) {
+        customRootRepository.deleteByDns(originDns);
+    }
+
+    @Override
+    public Set<RootDTO> findFullDns(String fullDns) {
+        Set<RootEntity> rootEntitySet = rootRepository.findAllByOriginDns(fullDns);
+        Set<RootDTO> rootDTOSet = new HashSet<>();
+        for (RootEntity rootEntity:
+        rootEntitySet){
+            RootDTO rootDTO = modelMapper.map(rootEntity, RootDTO.class);
+            rootDTOSet.add(rootDTO);
+        }
+        return rootDTOSet;
     }
 
     private DomainEntity getDomainEntity(RootDTO rootDTO) {

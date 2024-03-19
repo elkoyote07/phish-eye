@@ -24,6 +24,9 @@ public class RootEntity {
     @Column(name = "dns", nullable = false)
     private String dns;
 
+    @Column(name = "origin_dns", nullable = false)
+    private String originDns;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "domain_id")
     private DomainEntity domainEntity;
